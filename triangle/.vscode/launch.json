@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense para saber los atributos posibles.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos.
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Test Script with Random Cases",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--random",
+                "5",      // Amount of random cases
+                "10",     // Size of each list
+                "10",     // Max value
+                "-10"     // Min value
+            ]
+        },
+        {
+            "name": "Run Test Script with Fixed Cases",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--fixed"
+            ]
+        },
+    ]
+}
