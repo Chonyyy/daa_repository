@@ -118,45 +118,5 @@ Es importante destacar que esta complejidad está determinada principalmente por
 Finalmente, la complejidad global del algoritmo está completamente dominada por el costo de aplicar Bellman-Ford en cada iteración, lo que confirma que la complejidad final es $O(n^3)$, independientemente de la naturaleza específica de las subsecuencias encontradas o del número total de iteraciones necesarias para alcanzar el flujo máximo.
 
 
-\section{Mejoras}
-Una posible forma de mejorar la complejidad del algoritmo es disminuir el orden de la cantidad de aristas del grafo original. Para ello, hay un grupo de cuestiones a tener en cuenta:
-
-Sean:
-\begin{itemize}
-    \item $n_{i}$ la nota que corresponde a la posición $i$ de la secuencia de entrada.
-    \item $n_{j}~|~ n_{j}=n_{i}+1 \wedge \forall n_{k}~ (k>i \wedge n_{k}=n_{i}+1 \Rightarrow k>j)$.
-    \item $n_{l}~|~ n_{l}=n_{i}-1 \wedge \forall n_{k}~ (k>i \wedge n_{k}=n_{i}-1 \Rightarrow k>l)$.
-    \item $n_{p}~|~ n_{p}\equiv n_{i}(7) \wedge \forall n_{k}~ (k>i \wedge n_{k}\equiv n_{i}(7) \Rightarrow k>p)$.
-\end{itemize}
-
-Entonces $\forall n_{k}|~ |n_{k}-n_{i}|=0  \vee n_{k}\equiv n_{i}(7)$ se cumple que:
-
-Si $|n_{k}-n_{i}|=0$ entonces $n_{k}=n_{i}+1 \vee n_{k}=n_{i}-1$:
-
-\begin{itemize}
-    \item $n_{k}=n_{i}+1 \Rightarrow n_{k}=n_{j}$.
-    \item $n_{k}=n_{i}-1 \Rightarrow n_{k}=n_{l}$.
-\end{itemize}
-
-Si $n_{k}\equiv n_{i}(7)$ entonces $n_{k}\equiv n_{p}(7)$.
-
-Luego, si desde cada nota $n_{i}$ tenemos una arista hacia cada una de las notas $n_{j}$, $n_{l}$, $n_{p}$ y desde cada una de ellas tenemos aristas hacia cada una de las notas del mismo valor o que dejan el mismo resto al dividirlas entre 7, logramos que cada una de las notas alcanzables desde $n_{i}$ sean alcanzables desde alguna de las notas $n_{j}$, $n_{l}$ o $n_{p}$.
-
-Por tanto, en el grafo por cada nota $n_{i}$ tendremos 4 vértices:
-\begin{itemize}
-    \item $v_{i,1}$: vértice al que llegarán todas las aristas provenientes de vértices $v_{j,1}$ tales que $n_{j}$ coincide con $n_{i}$ y las aristas provenientes de vértices $v_{j,4}$ tales que la diferencia modular entre $n_{j}$ y $n_{i}$ es 1. Desde este vértice se tiene una arista hacia el siguiente vértice $v_{j,1}$, tal que $n_{i} = n_{j}$.
-    
-    \item $v_{i,2}$: vértice al que llegarán todas las aristas provenientes de vértices $v_{j,2}$ cuyo valor $n_{j}$ es congruente módulo 7 con $n_{i}$. Desde este vértice se tiene una arista hacia el siguiente vértice $v_{j,2}$, tal que $n_{i} \equiv n_{j} (7)$.
-    
-    \item $v_{i,3}$: vértice al que están conectados los dos anteriores, mediante una arista de costo 0 y capacidad 1, cada uno respectivamente. El vértice auxiliar usado como origen también tiene una arista de costo 0 y capacidad 1 hacia este vértice.
-    
-    \item $v_{i,4}$: vértice al que está conectado $v_{i,3}$, mediante una arista con costo -1 y capacidad 1, que análogamente a la primera modelación vista, representa la inclusión de esta nota en la canción. Desde este vértice se tienen aristas hacia los próximos vértices $v_{j,1}$, $v_{k,1}$ y $v_{l,2}$ tales que $n_{i}=n_{j}-1$, $n_{i}=n_{k}+1$ y $n_{i} \equiv n_{l}(7)$ respectivamente. También se incluye la arista hacia el vértice auxiliar de salida.
-\end{itemize}
-
-Nota: Todas las aristas para las cuales no se especificó costo ni capacidad tienen valores de 0 y 1, respectivamente.
-
-Luego, por cada una de las notas, se tienen a lo sumo 6 aristas que salen de alguno de los vértices especificados anteriormente, de manera que la cantidad de aristas del grafo resultante es $O(n)$, donde $n$ es la cantidad de notas en la secuencia de entrada.
-
-
 
 \end{document}

@@ -4,4 +4,3 @@
 \contentsline {subsection}{\numberline {3.1}Construcci\IeC {\'o}n del Grafo}{3}{subsection.3.1}
 \contentsline {subsection}{\numberline {3.2}Algoritmo Bellman-Ford}{3}{subsection.3.2}
 \contentsline {subsection}{\numberline {3.3}Algoritmo MinCost-MaxFlow}{4}{subsection.3.3}
-\contentsline {section}{\numberline {4}Mejoras}{5}{section.4}
