@@ -1,0 +1,258 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\title{\bf{Pol\'{i}gono M\'{a}gico}}
+\date{}
+\author{María de Lourdes Choy Fernández \\ Alejandro Yero Valdéz \\ Leismael Sosa}
+
+
+\begin{document}
+\pagestyle{empty}
+\maketitle
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[scale=1]{images}
+\end{center}
+\newpage
+
+\tableofcontents
+
+\newpage
+\setcounter{page}{1}
+\pagestyle{plain}
+
+\section{Problema}
+En un reino lejano, existía un mago llamado Alejandro que protegía un gran tesoro escondido dentro de un castillo mágico. Este castillo tenía la forma de un polígono perfecto y estrictamente convexo con $n$ torres, cada una conectada por paredes fuertes e inquebrantables.
+
+La reina María que creía firmemente en las ideas de la Revolución (¿Cuál? no sé, la revolución mágica del reino lejano) decidió que era hora de compartir parte del tesoro con el pueblo, pero debía hacerlo con cuidado para no despertar la ira de Alejandro. La reina María llamó a los mejores arquitectos del reino y les pidió que hicieran $k$ cortes en las paredes del castillo, utilizando portales mágicos que conectaran dos torres distintas que no estuvieran directamente adyacentes. Sin embargo, había una advertencia: los portales no podían cruzarse en medio de las paredes, solo en las torres del castillo.
+
+El objetivo de la reina María era repartir las riquezas de tal manera que cada porción de territorio dentro del castillo fuera lo más equitativa posible. Así, pidió a los arquitectos que maximizaran el área de la porción más pequeña que se formara dentro del castillo después de colocar los $k$ portales mágicos.
+
+Tu tarea es ayudar a la reina María a encontrar la mejor manera de cortar el castillo para que la distribución del tesoro sea justa para todos.
+
+(PD: Cuando Alejandro regresó a su castillo y lo vio todo cuarteado, en un ataque de ira convocó a la bestia mágica Yesapin, pero eso es historia para otro momento)
+
+\section{Modelaci\'{o}n}
+
+\subsection{Definiciones}
+\subsubsection{Triangulaci\'{o}n de un pol\'{i}gono convexo}
+
+
+Por conocimientos de geometr\'{i}a se conoce que la cantidad m\'{a}xima de tri\'{a}ngulos en los que se puede dividir un pol\'{i}gono es $n-2$, donde $n$ es la cantidad de v\'{e}rtices del pol\'{i}gono, esto es el resultado de realizar $n-3$ cortes sin que se crucen y solamnte inciden el los v\'{e}rtices de dicho pol\'{i}gono.
+
+
+\subsubsection{Subdivisi\'{o}n ideal}
+
+
+Se define \textit{subdivisi\'{o}n ideal} a una subdivisi\'{o}n donde todas las areas resultantes tras la divisi\'{o}n tienen igual \'{a}rea.
+
+
+\subsubsection{Corte ideal}
+
+
+Se define \textit{corte ideal} a aquel corte que genera un \'{a}rea lo m\'{a}s cercana posible modularmente a $\frac{A_p}{k+1}$.
+
+
+\subsection{Abstracc\'{i}on del problema}
+
+
+Tenemos como objetivo del problema maximizar el \'{a}rea m\'{a}s peque\~{n}a resultante de realizar $k$ cortes. El caso ideal ser\'{i}a poder realizar siempre una subdivisi\'{o}n ideal pero eso casi nunca es posible con las condiciones del problema, por consiguiente enfocaremos nuestro objetivo en aproximarnos lo m\'{a}s posible a dicha subdivisi\'{o}n.
+
+
+\newpage
+\section{Soluci\'{o}n}
+\subsection{Fuerza bruta}
+
+
+La primera idea intuitiva fue tomar las combinaciones de pares de tama\~{n}o $k$ y computarlas todas, evaluar las \'{a}reas resutantes y quedarnos con la mejor soluci\'{o}n. Evidentemente esto es altamente costoso, la cantidad de formas posible de distribuir $k$ cortes en $n$ v\'{e}rtices pasa por cuantas triangulaciones distintas se pueden formar en un pol\'{i}gono convexo est\'{a} dado por $n-2$-\'{e}simo n\'{u}mero de Catal\'{a}n $C_{n-2} = \frac{1}{n-1}\binom{2n-4}{n-2}$ por tanto todas las combinaciones posibles son $\binom{C_{n-2}}{n-(2+k)}$ quedando dicha soluci\'{o}n en una complejidad no polinomial.
+
+
+\subsection{Acercamiento por camino de costo m\'{i}nimo}
+
+
+La idea detr\'{a}s de esto es ver el pol\'{i}gono convexo como un grafo c\'{i}clico $C_n$ ponderar todas las aristas pertenecientes al ciclo con peso $0$ y cada corte con peso $A_p - A_d$ donde $A_p$ es el \'{a}rea del pol\'{i}gono y $A_d$ es el \'{a}rea m\'{a}s peque\~{n}a que genera ese corte. Al usar la ponderaci\'{o}n el camino de costo m\'{i}nimo tiene peso en todas las aristas del \'{a}rea m\'{a}s peque\~{n}a que genera esa subdivis\'{i}on, por lo que indiscutiblemente si todos los caminos deber\'{i}an usar exactamente $k$ aristas ponderadas entonces el resultado ser\'{i}a la subdivis\'{i}on \'{o}ptima. Esto gener\'{o} un problema extremadamente grande, como ponderar los cortes? Sin discusi\'{o}n para lograr la ponderaci\'{o}n deseada se necesitaba tener en cuenta que cortes se hab\'{i}an hecho anteriormente para asignarle el valor correcto. Por este motivo la ejecuci\'{o}n de esa soluci\'{o}n fue descartada tan pronto como lleg\'{o}.
+
+
+Analogamente pensamos en una soluci\'{o}n por flujo, dado que el problema de ponderar las aristas es irracional tampoco se pudo obtener nada concreto por esa v\'{i}a.
+
+
+\subsection{Greedy}
+
+
+Con varias ideas pensadas ya para solucionar el problema, hab\'{i}amos pasado por deconstruir las triangulaciones posibles y parec\'{i}a que las deconstrucciones aparentemente dejaban cortes con \'{a}reas siempre lo m\'{a}s cercanas posibles a $\frac{A_p}{k+1}$, pero si esto ocurre, por qu\'{e} no simplemente ir construyedo la soluci\'{o}n haciendo \textit{cortes ideales}. La idea es demostrar que al hacer un corte de este tipo el subproblema debajo es de subestructura \'{o}ptima. Hab\'{i}a que demostrar que sea cual fuera el corte que se decidiera hacer con esa premisa pertenec\'{i}a a una soluci\'{o}n del problema (una subdivisi\'{o}n ideal).
+
+
+Primeramente que suceder\'{i}a si existen 2 cortes que modularmente est\'{a}n a la misma distancia del \'{a}rea \'{o}ptima uno de ellos deja un \'{a}rea m\'{a}s peque\~{n}a, mientras el otro una m\'{a}s grande. Pero si es cierto que todo corte decidido con la premisa greedy pertenece a una soluci\'{o}n del problema entonces da igual que corte escoger porque en ambos casos el criterio de la premisa es v\'{a}lido.
+
+
+Al no tener conocimiento del resto de las divisiones siguientes a realizar en caso de que $k>1$ porque solamente se esta teniendo en cuenta un corte por el criterio greedy no es posible demostrar que es igual.
+
+
+Si dado el criterio Greedy no se puede concluir en que el resto de la subestructura va en camino a una soluci\'{o}n \'{o}ptima entonces necesitabamos enfocarnos en una forma diferente de solucionar el problema, sin perder de vista que el caso ideal es picar el pol\'{i}gono original en $k+1$ pol\'{i}gonos de tama\~{n}o exactamente $\frac{A_p}{k+1}$ por consiguiente optamos por mezclar la idea greedy en un nuevo enfoque.
+
+
+\subsection{Solución propuesta}
+
+Para maximizar el área mínima \( w \), utilizaremos una técnica de \textbf{búsqueda binaria} sobre el posible rango de \( w \). Para cada valor candidato de \( w \), verificaremos si es posible dividir el polígono en \( k+1 \) regiones con áreas \(\geq w\) usando una programación dinámica eficiente.
+
+
+Digamos que queremos particionar el pol\'{i}gono en $k+1$ \'{a}reas de al menos tama\~{n}o \emph{w}. Sea \emph{i,j} un par de v\'{e}rtices no adyacentes en el pol\'{i}gono, entonces se puede establecer un corte v\'{a}lido entre \emph{i,j}. Necesitar\'{i}amos saber cu\'{a}ntas regiones de tama\~no correcto se pueden obtener usando solamente este intervalo. El \'{a}rea contigua al corte ser\'a considerada \emph{resto}.
+
+
+Dado dos conjuntos de \emph{cortes correctos} es \'optimo seleccionar aquel que m\'as cortes tiene, eso deja menos cortes a realizar en el \emph{resto} del intervalo seleccionado. Si tienen la misma cantidad de \emph{cortes correctos} entonces seleccionamos aquel que mayor \emph{resto} tenga.
+
+
+Este enfoque abre paso a un nuevo tipo de soluci\'on por programaci\'on din\'amica. Definamos $dp_{i,j}$ como una tupla de $(c_{i,j}, r_{i,j})$ donde $c_{i,j}$ es la cantidad de cortes m\'aximos y $r_{i,j}$ el resto m\'aximo en el intervalo $(i,j)$. Para calcular \emph{dp} iteramos por todos los \emph{k} con $i < k < j$ y tambi\'en se considerar\'a \emph{k} como un v\'ertice del \emph{resto} del corte $(i,j)$. Esto no es m\'as que una transici\'on entre el estado $dp_{i,k}$ y $dp_{k,j}$ es decir un subcorte por \emph{k} del intervalo $(i,j)$ y un nuevo corte si \emph{k} formaba parte del resto para decidir que es lo mejor si picar en intervalo $(i,j)$ o realizar un nuevo corte. Despu\'es de calcular \emph{dp} podemos cortar por el intevalo dado si se cumple que el resto es al menos del tama\~no deseado, es decir si $r_{i,j} \geq w$.
+
+Dado lo planteado en esta soluci\'on si se cumple que $c_{1,n} > k+1$ entonces significa que podemos realizar \emph{k cortes correctos} garantizando \'area menos al menos \emph{w}. 
+
+La complejidad temporal de este algoritmo es $O(n^3(log(10^{16})))$, la cual explicaremos posteriormente.
+
+
+\subsection{Programación Dinámica (DP)}
+
+Definimos una tabla de programación dinámica \( dp[i][j] \) que almacenará información sobre el intervalo de vértices \( (T_i, T_j) \) del polígono. Específicamente, \( dp[i][j] \) será una tupla \( (c_{i,j}, r_{i,j}) \), donde:
+
+\begin{itemize}
+    \item \( c_{i,j} \): Número máximo de cortes válidos que se pueden realizar dentro del intervalo \( (i, j) \) tal que cada subregión resultante tenga un área \(\geq w\).
+    \item \( r_{i,j} \): Área residual máxima restante en el intervalo \( (i, j) \) después de realizar los cortes.
+\end{itemize}
+
+\subsubsection{Inicialización}
+
+Para cada par de vértices adyacentes \( (i, j) \), donde \( j = i+1 \) (considerando la numeración cíclica del polígono), no se pueden realizar cortes adicionales. Por lo tanto:
+
+\[
+dp[i][j] = (0, \text{ÁreaTotalPolígono})
+\]
+
+\subsubsection{Transición}
+
+Para un intervalo \( (i, j) \) con \( j > i+1 \), consideramos todos los posibles vértices \( k \) tales que \( i < k < j \) para realizar un corte entre \( i \) y \( j \) pasando por \( k \). Para cada \( k \):
+
+\begin{enumerate}
+    \item \textbf{Cortes en subintervalos:}
+    \begin{itemize}
+        \item \( dp[i][k] \): Información sobre el intervalo \( (i, k) \).
+        \item \( dp[k][j] \): Información sobre el intervalo \( (k, j) \).
+    \end{itemize}
+    \item \textbf{Cálculo de cortes y residuo:}
+    \[
+    c_{\text{total}} = c_{i,k} + c_{k,j} + 1 \quad (\text{el } +1 \text{ es por el corte } (i, j) \text{ mismo})
+    \]
+    \[
+    r_{\text{total}} = \min(r_{i,k}, r_{k,j})
+    \]
+    \item \textbf{Actualización de \( dp[i][j] \):}
+    \begin{itemize}
+        \item Seleccionamos la opción que maximiza \( c_{\text{total}} \). Si hay empate en \( c_{\text{total}} \), elegimos la que maximiza \( r_{\text{total}} \).
+    \end{itemize}
+\end{enumerate}
+
+Formalmente:
+
+\[
+dp[i][j] = \max_{i < k < j} \left\{
+    \begin{array}{ll}
+        (c_{i,k} + c_{k,j} + 1, \min(r_{i,k}, r_{k,j}))
+    \end{array}
+\right\}
+\]
+
+\subsubsection{Condición de Corte Válido}
+
+Después de llenar la tabla \( dp \), para el intervalo completo \( (1, n) \):
+
+\begin{itemize}
+    \item Si \( dp[1][n].c \geq k \) y \( dp[1][n].r \geq w \), entonces es posible realizar \( k \) cortes que cumplan con el requisito de área mínima \( w \).
+\end{itemize}
+
+\subsection{Búsqueda Binaria para Maximizar \( w \)}
+
+Dado que queremos maximizar \( w \), utilizamos una búsqueda binaria sobre el rango posible de áreas \( w \). El procedimiento es el siguiente:
+
+\begin{enumerate}
+    \item \textbf{Determinar el rango de búsqueda:}
+    \begin{itemize}
+        \item \textbf{Mínimo:} \( w_{\text{min}} = \) Área mínima posible (puede ser 0).
+        \item \textbf{Máximo:} \( w_{\text{max}} = \frac{\text{Área total del polígono}}{k+1} \).
+    \end{itemize}
+    \item \textbf{Búsqueda binaria:}
+    \begin{itemize}
+        \item Mientras \( w_{\text{max}} - w_{\text{min}} \) sea mayor que una precisión deseada:
+        \begin{itemize}
+            \item \( w_{\text{mid}} = \frac{w_{\text{min}} + w_{\text{max}}}{2} \).
+            \item Verificar si es posible realizar \( k \) cortes con \( w = w_{\text{mid}} \) usando la DP descrita.
+            \item Si es posible, actualizar \( w_{\text{min}} = w_{\text{mid}} \); de lo contrario, actualizar \( w_{\text{max}} = w_{\text{mid}} \).
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Resultado:}
+    \begin{itemize}
+        \item \( w_{\text{min}} \) convergerá al valor máximo de \( w \) que permite realizar los cortes requeridos.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Argumentación de Correctitud}
+
+\begin{itemize}
+    \item \textbf{Divisibilidad:} La programación dinámica asegura que todas las posibles formas de dividir el polígono se consideren, garantizando que se encuentra una solución óptima si existe.
+    \item \textbf{Maximización del Área Mínima:} Al utilizar búsqueda binaria para maximizar \( w \) y verificar su viabilidad con DP, garantizamos que el \( w \) encontrado es el más grande posible que cumple con los requisitos.
+    \item \textbf{No Cruce de Diagonales:} La definición de \( dp[i][j] \) y la naturaleza recursiva de la DP aseguran que los cortes no se crucen fuera de los vértices, ya que cada subintervalo se maneja de manera independiente y combinada sin superposición indebida.
+\end{itemize}
+
+\subsection{Complejidad Temporal}
+
+Analicemos la complejidad temporal de cada componente del algoritmo:
+
+\subsubsection{a. Programación Dinámica (DP)}
+
+\begin{itemize}
+    \item \textbf{Estados:} Existen \( O(n^2) \) posibles intervalos \( (i, j) \) en el polígono. Esto se debe a que cada par de vértices puede ser un punto de inicio y fin de un intervalo, y dado que hay \( n \) vértices, la combinación de estos genera \( \binom{n}{2} \) intervalos.
+    
+    \item \textbf{Transiciones por Estado:} Para cada intervalo \( (i, j) \), consideramos todos los vértices \( k \) tales que \( i < k < j \). Dado que \( k \) puede tomar cualquier valor entre \( i \) y \( j \), esto implica que hay hasta \( O(n) \) transiciones por estado. Así, para cada intervalo, iteramos sobre todos los posibles vértices internos.
+
+    \item \textbf{Cálculo por Transición:} Cada transición involucra un número constante de operaciones, como sumas y cálculos de mínimo. Por lo tanto, el costo de calcular el resultado para una transición es \( O(1) \).
+
+    \item \textbf{Total DP:} Combinando los \( O(n^2) \) estados y las \( O(n) \) transiciones por estado, la complejidad total para la programación dinámica es:
+    \[
+    O(n^2 \cdot n) = O(n^3).
+    \]
+\end{itemize}
+
+\subsubsection{b. Búsqueda Binaria}
+
+\begin{itemize}
+	\item Para la búsqueda binaria, la complejidad temporal en el peor de los casos es $O(log n)$, donde n es el número de elementos de la matriz. Esto significa que, en el peor de los casos, el algoritmo solo tiene que comprobar log n elementos en la matriz, donde log n es el logaritmo en base 2 de n.
+	
+    \item \textbf{Número de Iteraciones:} Si el área total es \( A \), y suponiendo que queremos una precisión de \( \epsilon \), la cantidad de iteraciones necesarias en la búsqueda binaria es \( O(\log(\frac{A}{\epsilon})) \). Dado que \( A \) puede ser muy grande (por ejemplo, \( 10^{16} \)), esto se traduce en:
+    \[
+    O(\log(10^{16})),
+    \]
+    que es constante en términos de notación asintótica.
+\end{itemize}
+
+\subsubsection{c. Complejidad Total}
+
+\begin{itemize}
+    \item \textbf{Total:} Combinando la complejidad de la programación dinámica con la búsqueda binaria, obtenemos:
+    \[
+    O(n^3 \cdot \log(A)),
+    \]
+    donde \( A \) es el área máxima posible (aquí estimado como \( 10^{16} \)).
+\end{itemize}
+
+Por lo tanto, la complejidad temporal del algoritmo es:
+
+\[
+O(n^3 \cdot \log(10^{16})).
+\]
+
+
+
+
+\end{document}
+
