@@ -1,0 +1,233 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{csquotes}
+
+\newtheorem{problema}{Problema}[section]
+
+\title{\bf{Rompiendo amistades}}
+\date{}
+\author{María de Lourdes Choy Fernández \\ Alejandro Yero Valdéz \\ Leismael Sosa}
+
+\begin{document}
+\pagestyle{empty}
+\maketitle
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[scale=1]{images}
+\end{center}
+\newpage
+
+\tableofcontents
+
+\newpage
+\setcounter{page}{1}
+\pagestyle{plain}
+
+\section{Problema}
+% Descripción detallada del problema a resolver. Incluir ejemplos y casos de prueba si es necesario.
+Por algún motivo, a María no le gustaba la paz y le irritaba que sus compañeros de aula se llevaran tan bien.
+Ella quería ver el mundo arder. Un día un demonio se le acercó y le propuso un trato: \enquote{A cambio de un cachito de tu alma,
+te voy a dar el poder para romper relaciones de amistad de tus compañeros, con la única condición de que no puedes romperlas todas}.
+Sin pensarlo mucho (Qué más da un pequeño trocito de alma), María aceptó y se puso a trabajar. Ella conocía,
+dados sus k compañeros de aula, quiénes eran mutuamente amigos.
+
+Como no podía eliminar todas las relaciones de amistad, pensó en qué era lo siguiente que podía hacer más daño.
+Si una persona quedaba con uno o dos amigos, podría hacer proyectos en parejas o tríos (casi todos los de la
+carrera son así), pero si tenía exactamente tres amigos, cuando llegara un proyecto de tres personas, uno de sus
+amigos debería quedar afuera y se formaría el caos.
+
+Ayude a María a saber si puede sembrar la discordia en su aula eliminando relaciones de amistad entre sus
+compañeros de forma que todos queden, o bien sin amigos, o con exactamente tres amigos.
+
+\subsection{Formalización del problema}
+
+Este problema se puede describir en términos de teoría de grafos. Aquí el grafo sería no dirigido,
+donde los compañeros de María serían los nodos del grafo y una arista entre 2 nodos representa la
+amistad entre 2 compañeros.
+
+Como María quiere que todos sus compañeros estén sin amigos o con exactamente 3 amigos, sin romper todas
+las relaciones, entonces se puede decir que el objetivo de este problema es encontrar en $G$ un subgrafo $G'$
+tal que todos sus nodos tengan grado 0 o 3 y donde exista al menos 1 de grado 3 (no puede romper todas las amistades).
+Si ignoramos todos los nodos de grado 0, entonces el problema se puede reformular en el siguiente.
+
+\begin{problema}\label{prob_1}
+ Dado un grafo no dirigido $G = (V, E)$, el objetivo es determinar si existe en $G$ un subgrafo $G' = (V', E')$
+ tal que todos los vértices en $G'$ tengan exactamente grado 3, es decir, tal que $G'$ sea regular de orden 3.
+\end{problema}
+
+\section{Demostración de NP completitud}
+
+Para demostrar que el problema \ref{prob_1} es \textbf{NP-completo} primero demostraremos que es subconjunto de \textbf{NP}. Esto es sencillo
+de ver pues si tenemos un grafo $G'$ de $G$, el verificar que $G'$ es un grafo regular de grado 3 (llamado en algunas bibliografías grafo cúbico)
+se puede realizar en tiempo polinomial iterando por todos sus nodos y verificando que todos tengan grado 3.
+
+Ahora, para demostrar que es \textbf{NP-completo} el problema de decisión, de determinar si un grafo $G$ tiene un subgrafo regular de grado 3 (de ahora en adelante lo llamaremos como cúbico),
+tenemos que reducir algún problema \textbf{NP-completo} a nuestro problema. Esto lo haremos con el problema de $3$-coloración que fue demostrado
+\textbf{NP-completo} por Karps, ver \cite{3-color}.
+
+El problema de 3 coloración es el siguiente:
+
+\begin{problema}\label{prob_2}\textbf{3-coloración}
+
+    Dado un grafo no dirigido $G = (V,E)$, determinar si existe alguna partición $V_1,V_2,V_3$ de $V$ tal que se cumpla que
+    para todo para de nodos $x,y\in V_i$, no existe la arista $<x,y>$
+\end{problema}
+
+En la siguiente sub-sección demostraremos la reducción del problema \ref{prob_2} al \ref{prob_1}
+
+\subsection{Reducción}
+
+Para realizar la reducción, tenemos que encontrar una forma de transformar un grafo $G$ en otro grafo $G'$, tal que
+en $G$ exista una 3-coloración si y solo si en $G'$ existe un subgrafo cúbico.
+
+Es decir, lo primero que tenemos que encontrar es una función $f(G) \to G'$ que traduzca un problema de 3-coloración en un
+problema de determinar si existe un subgrafo cúbico. La forma en la que formaremos $G'$ dado $G$, es en esencia creando nuevos nodos
+que formen ciclos y otros nuevos que se conecten de forma inteligente a estos ciclos. La intuición detrás de esta idea es debida
+a la propiedad de que todos los nodos involucrados en un ciclo tienen grado 2 y cuando conectas nuevos nodos a estos ciclos
+empiezas a tener nodos de grado 3 y si escoges cuidadosamente un subconjunto de todos los nodos generados es bastante probable que todos
+estos tengan grado 3. Ahora, lo que haremos es mostrar precisamente como construir los ciclos y los nodos que se conectan a estos, de forma
+que se encuentre una equivalencia entre los problemas en cuestión.
+
+
+Sea $G = (V, E)$ un grafo de entrada al problema de 3-coloración. Denotemos sus nodos como
+$v_1,v_2,\dots,v_n$ y sus aristas como $e_1,e_2,\dots,e_m$. También para todo nodo $v_i$ definimos
+$d_i$ como su grado, y a $\delta_i$ como el conjunto de los indices de todas las aristas que inciden en $v_i$.
+Ordenando el conjunto $\delta_i$ de menor a mayor, obtenemos $\delta_{i,1}, \delta_{i,2},\dots,\delta_{i,d_i}$,
+donde nuevamente, $\delta_{i,j}$ representa el indice de la arista que ocupa la posición $j$ en el orden definido.
+
+Ahora, para construir el grafo $G' = (V', E')$, comenzaremos definiendo cuales
+son los nodos de este grafo y luego cuales son sus aristas.
+
+Los nodos de $G'$ se construirán de la siguiente forma:
+\begin{itemize}
+    \item Por cada nodo $v_i\in V$ crearemos los nodos $v_{i,j}^h$ para cada $1\leq j \leq 3d_i + 2$ y $1\leq h\leq 3$. Que denominaremos \textit{nodos ciclo}.
+    \item Por cada arista $e_i\in E$ crearemos los llamados \textit{nodos aristas} $a_j^h$ para cada $1\leq h \leq 3$.
+    \item Por cada nodo $v_i\in V$ crearemos 2 nodos $q_i$ y $r_i$ que denominaremos \textit{nodos representantes}, pues solo existirá un par de estos por cada nodo de $V$.
+\end{itemize}
+
+Con la construcción de las aristas del nuevo grafo $G'$ se podrá apreciar cuales son los nodos que forman ciclos y cuales
+son los que se conectan a estos ciclos. El conjunto de las aristas $E'$ de $G'$ se construye como sigue:
+\begin{itemize}
+    \item Para todo $1\leq i\leq n$, donde $n=|V|$, se crea una arista entre los nodos $v_{i,j}^h$ y $v_{i,j+1}^h$ (donde el subíndice $j$ se toma módulo $3d_i + 2$), para todo $1\leq h\leq 3$. Esto creará un ciclo entre los nodos $v_{i,j}^h$ (de aquí sale el nombre de \textit{nodos ciclos}) y se puede observar que se crean exactamente 3 ciclos por cada $v_i\in V$. Por comodidad denotaremos estos ciclos por $C_i^h $
+    \item Para todo nodo $v_i\in V$ y para todo $1\leq h\leq 3$, se crearán aristas entre el \textit{nodo arista} $a_{\delta_{i,j}}^h$ y los 3 nodos consecutivos $v_{i,3j}^h, v_{i,3j+1}^h, v_{i,3j+2}^h$ del ciclo $C_i^h$ para todo $1\leq j \leq d_i$. Pero como el nodo $a_{\delta_{i,j}}^h$ representa una arista en $G$ entre 2 nodos, se tiene que el nodo $a_{\delta_{i,j}}^h$ estará conectado a otros 3 nodos consecutivos del ciclo $C_{\delta_{i,j}}^h$, para un total de 6 aristas conectadas a cada \textit{nodo arista}
+    \item Para todo nodo $v_i\in V$ creamos una arista entre el \textit{nodo representante} $q_i$ y los nodos $v_{i,1}^h$ y $v_{i,2}^h$, para cada $1\leq h\leq 3$. Observar que estos son los nodos que no se conectaron a los \textit{nodos aristas}.
+    \item Para todo nodo $r_i$ creamos una arista con el nodo $r_{i+1}$ (módulo $n$), formando otro ciclo en $G'$, a este ciclo lo denotaremos por $R$
+    \item Por último, para todo $1\leq i\leq n$, creamos una arista entre los nodos $q_i$ y $r_i$.
+\end{itemize}
+
+Ahora que tenemos definida la transformación del grafo $G$ en el grafo $G'$, solo queda demostrar que en $G$ existe una 3-coloración si y solo si en $G'$ existe un subgrafo cúbico.
+\newline
+
+$(\Rightarrow)$ Demostración de la primera implicación.
+
+Supongamos que $G = (V,E)$ es un grafo 3-colorable, esto quiere decir que los nodos de $V$ se pueden
+particionar en 3 conjuntos $V^1,V^2,V^3$, donde los nodos que pertenecen al conjunto $V^i$ con $1\leq i\leq 3$
+tienen el mismo color y ninguna arista entre ellos. Ahora, del grafo $G'$ generado por $G$, tenemos que encontrar un subgrafo cúbico.
+Para esto tomaremos el grafo $G''$ como el subgrafo inducido en $G'$ por los nodos siguientes:
+\begin{itemize}
+    \item Para todo $1\leq i\leq n$, donde $n=|V|$ tomaremos los \textit{nodos representantes} $q_i$ y $r_i$.
+    \item Tomaremos todos los \textit{nodos aristas} $a_i^h$, para $1\leq i\leq m$ y $1\leq h\leq 3$, donde $m=|E|$.
+    \item Para todo nodo $v_i\in V^h$ tomaremos todos los nodos del ciclo $C_i^h$ para $1\leq j\leq 3$. Notar que por cada $v_i$ solo tomamos 1 de los 3 ciclos que genera en $G'$.
+\end{itemize}
+
+Ahora, solo tenemos que demostrar que $G''$ solo contiene nodos de grado 0 o 3, de donde si nos quedamos con el grafo resultante de
+quitar de $G''$ todos los nodos de grado 0 tendremos la solución.
+
+Los primeros nodos que se pueden observar de grado 3 son los nodos $r_i$, debido a que al formar el ciclo $R$ todos los nodos $r_i$ tienen grado 2 y al
+estar conectados siempre con los nodos $q_i$ se tiene que todos los $r_i$ son de grado 3.
+
+Los nodos $q_i$ al estar conectados con los nodos $r_i$ tienen grado al menos 1, pero se tiene que también están conectados con exactamente 1 par $v_{i,1}^h, v_{i,2}^h$ (de los 3 posibles pares), exactamente el par con $h$ igual
+a $V^h$, donde $V^h$ es el conjunto al que pertenece el nodo $v_i$, debido a que en $G''$ por cada $v_i$ existe un solo ciclo $C_i^h$.
+
+Sea $v_{x,y}^k$ un \textit{nodo ciclo} arbitrario en $G''$. Como para todo nodo $v_i\in V$ nos habíamos quedado con todos los nodos del ciclo $C_i^h$, entonces se tiene que si el
+\textit{nodo ciclo} $v_{x,y}^k$ pertenece a $G''$ entonces esta conectado con sus 2 \textit{nodos ciclos} adyacentes en el ciclo $C_x^k$. Pero también por la forma de construcción de $G'$
+se sabe que cada nodo $v_{x,y}^k$ también está conectado con exactamente 1 \textit{nodo representante} $q_x$ o un \textit{nodo arista} $a_{\delta_{x,y}}^k$ para algún $1\leq y\leq d_x$.
+De donde se tiene que cada \textit{nodo ciclo} $v_{x,y}^k$ tiene grado 3 (no puede tener un mayor grado debido a que en $G'$ todos los \textit{nodos ciclos} tienen exactamente grado 3).
+
+Para culminar el análisis tomemos un \textit{nodo arista} $a_i^h$ arbitrario, y supongamos que su arista asociada en el grafo $G$ es $e_i=<v_x,v_y>$. Aquí hay que observar
+que por construcción el \textit{nodo arista} $a_i^h$ está conectado a los 3 \textit{nodos ciclos} consecutivos $v_{x,3j}^h, v_{x,3j+1}^h, v_{x,3j+2}^h$ para algún $1\leq j\leq d_x$ y a los 3
+\textit{nodos ciclos} consecutivos $v_{y,3k}^h, v_{y,3k+1}^h, v_{y,3k+2}^h$ para algún $1\leq k\leq d_y$.
+Pero como $v_x$ y $v_y$ son adyacentes, entonces en el grafo $G$ pertenecen a particiones distintas de $V^1,V^2,V^3$, por lo que a lo sumo uno de los ciclos $C_x^h$ y $C_y^h$ pertenecerá a $G''$.
+De lo anterior se deduce que todos los \textit{nodos aristas} en $G''$ tienen grado 0 o 3.
+
+Por todo lo demostrado anteriormente concluimos que $G'$ tiene un subgrafo cúbico.\newline
+
+$(\Leftarrow)$ Demostración de la segunda implicación.
+
+Ahora tenemos que demostrar que si $G'$ tiene un subgrafo cúbico $G''$, entonces el grafo $G$ es 3-colorable.
+La idea de la demostración viene por observar que todo subgrafo cúbico $G''$ de $G'$ tiene que contener un subconjunto de los
+ciclos $C_i^h$ de $G'$ y como se demostrará que en $G''$ solo puede existir 1 de los 3 ciclos $C_i^1, C_i^2,C_i^3$ generados por cada
+nodo $v_i$ de $V$ y solamente 1 ciclo entre $C_i^h$ y $C_j^h$ si existe una arista en $G$ entre los nodos $v_i$ y $v_h$, pues se concluirá que colocando los nodos $v_i$, representantes de los ciclos $C_i^h$, en la partición $V^h$
+se tiene una 3-coloración valida en $G$. Formalmente la demostración es como sigue:
+
+Sea $V''$ el conjunto de los nodos de $G''$, entonces en $V''$ debe existir al menos un \textit{nodo ciclo} $v_{i,j}^h$, pues en caso contrario las únicas opciones
+para formar el subgrafo cúbico son los \textit{nodos aristas} $a_i^h$, y los \textit{nodos representantes} $q_i$ y $r_i$. Pero con estos nodos no se puede formar un subgrafo cúbico.
+En efecto, los \textit{nodos aristas} $a_i^h$ solo tienen conexiones con los \textit{nodos ciclos}, pero al no existir ninguno, los $a_i^h$ tienen grado 0.
+El \textit{nodo representante} $q_i$ solo tiene conexiones con los \textit{nodos ciclos} que no están y con exactamente el \textit{nodo representante} $r_i$, de donde $q_i$ tendría grado 1
+si los $r_i$ están presentes y grado 0 si no lo estuvieran, de donde los $q_i$ no pueden componer un subgrafo cúbico. Por otro lado los \textit{nodos representantes} $r_i$ al formar el ciclo $R$
+tienen como mínimo grado 2 y obtendrían grado 3 si estuvieran presentes los nodos $q_i$, debido a que se conectan exactamente con el nodo $q_i$ en $G'$, pero sabemos que no pueden estar presentes en un subgrafo
+cúbico si no existen \textit{nodos ciclos}.
+Con esto se concluye que todo subgrafo cúbico de $G''$ tiene que contener al menos un \textit{nodo ciclo} $v_{i,j}^h$.
+
+Como sabemos que $G''$ contiene al menos un \textit{nodo ciclo} $v_{i,j}^h$, ahora se demostrará que si $v_{i,j}^h\in V''$ entonces todos los nodos del ciclo $C_i^h$ deben estar en $V''$. Esto se ve
+claramente en que los nodos $v_{i,j}^h$ además de estar conectados con sus adyacentes en $C_i^h$, por construcción, tienen exactamente una conexión con un \textit{nodo arista} o el \textit{nodo representante} $q_i$,
+de donde para que el grafo $G''$ sea cúbico debe estar presente en $V''$ el nodo con el que $v_{i,j}^h$ está conectado fuera del ciclo además de sus \textit{nodos ciclos} adyacentes. Esto también trae como consecuencia
+que si $v_{i,j}^h\in V''$, entonces todos los nodos del ciclo $C_i^h$ están en $V''$.
+
+También tenemos que si el ciclo $C_i^k$ está presente en $G''$ entonces el \textit{nodo ciclo} $v_{i,1}^k\in V''$, pero para que su grado sea 3, tiene que ocurrir que el
+\textit{nodo representante} $q_i$ esté conectado a $v_{i,1}$, pero si $q_i\in V''$, entonces tiene que ocurrir que el \textit{nodo representante} $r_i\in V''$ pues de otra forma $q_i$ tendría grado 2.
+De esto se concluye que todos los \textit{nodos representantes} $q_i$ y $r_i$ pertenecen a $V''$. Pero también de aquí se demuestra que en $G''$ solo puede existir un ciclo entre
+$C_i^1, C_i^2, C_i^3$ pues en caso contrario $q_i$ estaría conectado a 2 nodos de al menos 2 de estos ciclos, provocando que el grado de $q_i$ sea de mínimo 5 y esto evitaría que $q_i$ estuviera en $G''$
+lo cual es absurdo pues demostramos que pertenece.
+
+Como se sabe que en $G''$ se encuentran ciclos $C_i^k$, entonces se sabe que tienen que existir \textit{nodos aristas} de la forma $a_i^k$ pues en caso contrario existirían en $C_i^k$ \textit{nodos ciclos}
+de la forma $v_{i, 3j}^k, v_{i, 3j + 1}^k, v_{i, 3j + 2}^k$ para algún $j$ que tendrían solamente grado 2 (por construcción). Entonces, supongamos que el \textit{nodo arista} $a_i^h$ está en $G''$,
+de donde su grado es 3. Como $a_i^h$ es un nodo que en $G$ está asociado con una arista $e_i = <v_x, v_y>$ (por construcción), se tiene que $a_i^h$ está conectado a 3 nodos de solamente un ciclo entre $C_x^h$ y  $C_y^h$.
+Esto es cierto, pues en caso contrario $a_i^h$ tendría grado 6 y es absurdo debido a que $a_i^h$ pertenece a $G''$.
+
+Para resumir, hemos demostrado cuales son los nodos que pueden conformar un subgrafo cúbico $G''$ sobre el grafo $G'$, es decir,
+hemos demostrado que si $G''$ es un subgrafo cúbico de $G'$ entonces en $G''$ solo existe exactamente un ciclo entre $C_i^1,C_i^2,C_i^3$
+y que si un \textit{nodo arista} $a_i^h$ asociado a la arista $e_i=<v_x,v_y>$ está en $G''$ entonces, en $G''$ solo puede existir exactamente
+uno de los ciclos $C_x^h$ y $C_y^h$. Todo esto junto demuestra que si $G''$ es un subgrafo cúbico, entonces el colocar el nodo $v_i$,
+representante del ciclo $C_i^h$ en $G''$ en la partición $V^h$, con $1\leq h\leq 3$, crea una 3-coloración valida en $G$. Luego queda demostrado
+que el problema \ref{prob_1} es un problema \textbf{NP-completo}.
+
+
+\section{Solución}
+
+Debido a que demostramos que el problema \ref{prob_1} es \textbf{NP-completo}, se sabe que actualmente no se conocen soluciones correctas a estos problemas y
+que a su vez se ejecuten en tiempo polinomial (pues en caso contrario se tendría que \textbf{P=NP}).
+
+Es sabido que para resolver problemas \textbf{NP-completos} hay que sacrificar correctitud o velocidad. Es por esto que probaremos 2 soluciones distintas en esta sección.
+Una solución buscará la correctitud sacrificando velocidad, este es el caso de la solución por Fuerza Bruta. La otra solución que expondremos es basada en el area de metaheuristicas.
+Para esta última solución transformaremos el problema de decisión \ref{prob_1} en un problema de optimización cuya solución óptima nos permita
+encontrar la solución en el problema original.
+% Para el problema \ref{prob_1} implementaremos 2 soluciones. Una será la implementación por Fuerza Bruta, que aunque es correcta también es exponencial. La otra será utilizando
+% un algoritmo de metaheuristica sobre una versión modificada del problema \ref{prob_1} (en la que este se transforma en un problema de optimización) que aunque no da la solución optima, se sabe que encuentra soluciones
+% cerca de la optimalidad en mucho menos tiempo que las opciones por Fuerza Bruta.
+
+\subsection{Fuerza Bruta}
+
+Dado un grafo $G=(V,E)$ la solución por Fuerza Bruta sigue construye todos los posibles subgrafos de $G$ utilizando Backtrack con un enfoque bottom-up, es decir,
+inicialmente se crea un grafo $G'$ con todos los nodos de $G$ pero sin aristas. Se prosigue con todas las formas de elegir la primera arista, luego la segunda arista y así
+sucesivamente. A la hora de agregar una nueva arista a $G'$ se analiza si algún nodo de este llega a obtener un grado mayor que 3, en cuyo caso no se agrega la arista y se poda
+la recursividad por esa rama. Si en algún punto del algoritmo se cumple que el grafo $G'$ tiene todos los nodos de grado 0 o 3, se devuelve el grafo y se da una respuesta afirmativa.
+Si al explorar todos los posibles subgrafos, no se encontró la solución, entonces se devuelve una respuesta negativa al problema.
+
+Como potencialmente este algoritmo explora todas las posibles combinaciones de aristas de $G = (V,E)$, donde $m=|E|$, entonces su complejidad es $O(2^m)$
+
+
+% \subsection{}
+
+\bigskip
+%%%%%%%%%%%%%%%
+\begin{thebibliography}{20}
+    \bibitem{3-color} R. M. Karp: \emph{Reducibility among combinatorial problems.} R. E. Miller et al. (eds.), Complexity of Computer Computations (1972), pp 85-103.
+\end{thebibliography}
+
+\end{document}
