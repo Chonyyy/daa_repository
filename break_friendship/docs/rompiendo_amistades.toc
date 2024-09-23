@@ -1,0 +1,7 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Problema}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Formalización del problema}{1}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Demostración de NP completitud}{1}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Reducción}{2}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Solución}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Fuerza Bruta}{6}{subsection.3.1}%
